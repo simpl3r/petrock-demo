@@ -78,8 +78,7 @@ export default function Home() {
       {/* User header with connected account info */}
       {(() => {
         const user = context?.user;
-        const avatarUrl =
-          user?.pfpUrl || user?.profileImageUrl || user?.avatarUrl || "/blue-icon.png";
+        const avatarUrl = user?.pfpUrl || "/blue-icon.png";
         const displayName = user?.displayName ?? "Guest";
         const username = user?.username;
         const fid = user?.fid;
