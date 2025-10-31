@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { minikitConfig } from "../minikit.config";
 import styles from "./page.module.css";
@@ -18,6 +19,7 @@ export default function Home() {
   const [petCount, setPetCount] = useState<number>(0);
   const [lastPetAt, setLastPetAt] = useState<number | null>(null);
   const [remainingMs, setRemainingMs] = useState<number>(0);
+  const [rockSrc, setRockSrc] = useState<string>("/pet-rock.png");
 
   // Загружаем прогресс из localStorage
   useEffect(() => {
@@ -102,7 +104,15 @@ export default function Home() {
         </p>
 
         <div className={styles.rockWrap}>
-          <img src="/sphere.svg" alt="Pet Rock" className={styles.rock} />
+          <Image
+            src={rockSrc}
+            alt="Pet Rock"
+            className={styles.rock}
+            width={400}
+            height={400}
+            priority
+            onError={() => setRockSrc("/sphere.svg")}
+          />
         </div>
 
         <button

@@ -49,7 +49,7 @@
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -60,7 +60,7 @@
 .subtitle {
   font-size: 1.2rem;
   line-height: 1.6;
-  margin-bottom: 3rem;
+  margin-bottom: 0.5rem;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 300;
 }
@@ -130,16 +130,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2rem 0 1rem;
+  margin: 0.25rem 0 0.5rem;
 }
 
 .rock {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #bbb, #888 60%, #666);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
 }
 
 .petButton {
