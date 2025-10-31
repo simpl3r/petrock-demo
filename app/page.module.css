@@ -124,3 +124,107 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(247, 217, 84, 0.4);
 }
+
+/* --- PetRock game styles --- */
+.rockWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0 1rem;
+}
+
+.rock {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #bbb, #888 60%, #666);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.petButton {
+  background: #7bd389;
+  color: #000;
+  border: none;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.petButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(123, 211, 137, 0.35);
+}
+
+.petButton:disabled,
+.petButton[aria-disabled="true"] {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.countdown {
+  margin-top: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.statLabel {
+  color: rgba(255, 255, 255, 0.7);
+  margin-right: 0.4rem;
+}
+
+.statValue {
+  font-weight: 700;
+}
+
+/* --- User header (top) --- */
+.userHeader {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.userName {
+  font-weight: 700;
+}
+
+.userMeta {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
