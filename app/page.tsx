@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { minikitConfig } from "../minikit.config";
 import styles from "./page.module.css";
+ 
 
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
@@ -17,51 +19,28 @@ export default function Home() {
 
   // Состояние игры
   const [petCount, setPetCount] = useState<number>(0);
-  const [lastPetAt, setLastPetAt] = useState<number | null>(null);
-  const [remainingMs, setRemainingMs] = useState<number>(0);
   const [rockSrc, setRockSrc] = useState<string>("/pet-rock.png");
+  const [isPetting, setIsPetting] = useState<boolean>(false);
+
+  
 
   // Загружаем прогресс из localStorage
   useEffect(() => {
     try {
       const storedCount = Number(localStorage.getItem("petrock_pet_count") || 0);
-      const storedLast = localStorage.getItem("petrock_last_pet_at");
       setPetCount(Number.isFinite(storedCount) ? storedCount : 0);
-      setLastPetAt(storedLast ? Number(storedLast) : null);
     } catch {
       // Игнорируем ошибки доступа к localStorage
     }
   }, []);
 
-  // Ежесекундно обновляем оставшееся время кулдауна
-  useEffect(() => {
-    const tick = () => {
-      if (!lastPetAt) {
-        setRemainingMs(0);
-        return;
-      }
-      const elapsed = Date.now() - lastPetAt;
-      const cooldown = 3 * 60 * 1000; // 3 минуты
-      const left = Math.max(cooldown - elapsed, 0);
-      setRemainingMs(left);
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [lastPetAt]);
+  
 
-  const canPet = remainingMs === 0;
+  
 
-  const formatTime = (ms: number) => {
-    const totalSeconds = Math.ceil(ms / 1000);
-    const m = Math.floor(totalSeconds / 60);
-    const s = totalSeconds % 60;
-    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  };
+  
 
   const handlePet = () => {
-    if (!canPet) return;
-    const nowTs = Date.now();
     setPetCount((prev) => {
       const next = prev + 1;
       try {
@@ -69,10 +48,8 @@ export default function Home() {
       } catch {}
       return next;
     });
-    setLastPetAt(nowTs);
-    try {
-      localStorage.setItem("petrock_last_pet_at", String(nowTs));
-    } catch {}
+    setIsPetting(true);
+    setTimeout(() => setIsPetting(false), 600);
   };
 
   return (
@@ -97,40 +74,64 @@ export default function Home() {
           </div>
         );
       })()}
-      <div className={styles.content}>
-        <h1 className={styles.title}>Pet Rock</h1>
-        <p className={styles.subtitle}>
-          Hi, {context?.user?.displayName || "friend"}. Pet the rock every 3 minutes.
-        </p>
+  <div className={styles.content}>
+    <h1 className={styles.title}>Pet Rock</h1>
+    <p className={styles.subtitle}>
+      Hi, {context?.user?.displayName || "friend"}. Pet the rock every 3 minutes.
+    </p>
+
+        
 
         <div className={styles.rockWrap}>
-          <Image
-            src={rockSrc}
-            alt="Pet Rock"
-            className={styles.rock}
-            width={400}
-            height={400}
-            priority
-            onError={() => setRockSrc("/sphere.svg")}
-          />
-        </div>
+          <motion.div
+            animate={
+              isPetting
+                ? { scale: [1, 1.05, 0.98, 1], rotate: [0, 2, -2, 0] }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          >
+            <Image
+              src={rockSrc}
+              alt="Pet Rock"
+              className={styles.rock}
+              width={400}
+              height={400}
+              priority
+              onError={() => setRockSrc("/sphere.svg")}
+            />
+            <AnimatePresence>
+              {isPetting && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0.5, 0] }}
+                  transition={{ duration: 0.6 }}
+                  className={styles.rockHighlight}
+                />
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-        <button
-          type="button"
-          className={styles.petButton}
-          onClick={handlePet}
-          disabled={!canPet}
-          aria-disabled={!canPet}
-        >
-          {canPet ? "Pet the rock" : "Please wait..."}
-        </button>
-
-        <div className={styles.countdown}>
-          {canPet ? (
-            <span>You can pet now!</span>
-          ) : (
-            <span>Next pet in {formatTime(remainingMs)}</span>
-          )}
+          <div className={styles.handOverlay}>
+            <button
+              className={styles.handButton}
+              onClick={handlePet}
+              disabled={isPetting}
+              aria-label="Погладить камень"
+            >
+              <div className={`${styles.handMotion} ${isPetting ? styles.handPetting : ""}`}>
+                <Image
+                  src="/hand.png"
+                  alt="Petting hand"
+                  className={styles.handImage}
+                  width={180}
+                  height={180}
+                  draggable={false}
+                  priority
+                />
+              </div>
+            </button>
+          </div>
         </div>
 
         <div className={styles.stats}>
@@ -138,17 +139,9 @@ export default function Home() {
             <span className={styles.statLabel}>Total pets:</span>
             <span className={styles.statValue}>{petCount}</span>
           </div>
-          {lastPetAt && (
-            <div>
-              <span className={styles.statLabel}>Last time:</span>
-              <span className={styles.statValue}>{new Date(lastPetAt).toLocaleTimeString()}</span>
-            </div>
-          )}
         </div>
 
-        <p className={styles.subtitle}>
-          Built for {minikitConfig.miniapp.name}. Come back in 3 minutes!
-        </p>
+        
       </div>
     </div>
   );
