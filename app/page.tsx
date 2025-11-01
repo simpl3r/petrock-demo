@@ -3,7 +3,12 @@ import { useState, useEffect } from "react";
 import PetRockButton from "../components/PetRockButton";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import styles from "./page.module.css";
- 
+
+type BeforeInstallPromptEvent = Event & {
+  readonly platforms?: string[];
+  prompt?: () => Promise<void> | void;
+  userChoice?: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
 
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
@@ -34,11 +39,11 @@ export default function Home() {
     } catch {
       setPetCount(0);
     }
-  }, []);
+  }, [STORAGE_KEY]);
 
   // Вызываем системный промпт установки PWA при открытии (если доступен)
   useEffect(() => {
-    const handler = (e: any) => {
+    const handler = (e: BeforeInstallPromptEvent) => {
       try {
         e.preventDefault?.();
         // Небольшая задержка, чтобы не мешать первичной загрузке UI
@@ -47,8 +52,8 @@ export default function Home() {
         }, 1200);
       } catch {}
     };
-    window.addEventListener("beforeinstallprompt", handler as any);
-    return () => window.removeEventListener("beforeinstallprompt", handler as any);
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
   
