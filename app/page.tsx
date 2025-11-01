@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import PetRockButton from "../components/PetRockButton";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { minikitConfig } from "../minikit.config";
 import styles from "./page.module.css";
@@ -19,8 +18,7 @@ export default function Home() {
 
   // Состояние игры
   const [petCount, setPetCount] = useState<number>(0);
-  const [rockSrc, setRockSrc] = useState<string>("/pet-rock.png");
-  const [isPetting, setIsPetting] = useState<boolean>(false);
+  
 
   
 
@@ -48,8 +46,6 @@ export default function Home() {
       } catch {}
       return next;
     });
-    setIsPetting(true);
-    setTimeout(() => setIsPetting(false), 600);
   };
 
   return (
@@ -82,57 +78,7 @@ export default function Home() {
 
         
 
-        <div className={styles.rockWrap}>
-          <motion.div
-            animate={
-              isPetting
-                ? { scale: [1, 1.05, 0.98, 1], rotate: [0, 2, -2, 0] }
-                : { scale: 1, rotate: 0 }
-            }
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          >
-            <Image
-              src={rockSrc}
-              alt="Pet Rock"
-              className={styles.rock}
-              width={400}
-              height={400}
-              priority
-              onError={() => setRockSrc("/sphere.svg")}
-            />
-            <AnimatePresence>
-              {isPetting && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.5, 0] }}
-                  transition={{ duration: 0.6 }}
-                  className={styles.rockHighlight}
-                />
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          <div className={styles.handOverlay}>
-            <button
-              className={styles.handButton}
-              onClick={handlePet}
-              disabled={isPetting}
-              aria-label="Погладить камень"
-            >
-              <div className={`${styles.handMotion} ${isPetting ? styles.handPetting : ""}`}>
-                <Image
-                  src="/hand.png"
-                  alt="Petting hand"
-                  className={styles.handImage}
-                  width={180}
-                  height={180}
-                  draggable={false}
-                  priority
-                />
-              </div>
-            </button>
-          </div>
-        </div>
+        <PetRockButton onPet={handlePet} />
 
         <div className={styles.stats}>
           <div>
