@@ -1,8 +1,7 @@
 "use client";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
-// Removed external Button, hand overlay is the clickable trigger
+import { useState, useEffect, useRef } from "react";
 
 type Props = {
   onPet?: () => void;
@@ -10,106 +9,172 @@ type Props = {
 
 export default function PetRockButton({ onPet }: Props) {
   const [isPetting, setIsPetting] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false);
+  const cooldownRef = useRef<number | null>(null);
+  const COOLDOWN_MS = 3 * 60 * 1000;
+  const [remainingMs, setRemainingMs] = useState(0);
+  const countdownIntervalRef = useRef<number | null>(null);
+  const cooldownEndRef = useRef<number | null>(null);
 
   const handlePet = () => {
+    if (isPetting || isCooldown) return;
     setIsPetting(true);
+    setIsCooldown(true);
+    cooldownEndRef.current = Date.now() + COOLDOWN_MS;
+    setRemainingMs(COOLDOWN_MS);
     try {
       onPet?.();
     } finally {
       setTimeout(() => setIsPetting(false), 600);
     }
+    if (cooldownRef.current) {
+      clearTimeout(cooldownRef.current);
+    }
+    cooldownRef.current = window.setTimeout(() => {
+      setIsCooldown(false);
+      setRemainingMs(0);
+      cooldownEndRef.current = null;
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      cooldownRef.current = null;
+    }, COOLDOWN_MS);
+
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+    countdownIntervalRef.current = window.setInterval(() => {
+      if (!cooldownEndRef.current) return;
+      const rem = Math.max(0, cooldownEndRef.current - Date.now());
+      setRemainingMs(rem);
+      if (rem <= 0) {
+        setIsCooldown(false);
+        setRemainingMs(0);
+        cooldownEndRef.current = null;
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+      }
+    }, 1000);
   };
 
+  // Очистка таймера кулдауна при размонтировании
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) {
+        clearTimeout(cooldownRef.current);
+        cooldownRef.current = null;
+      }
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center space-y-5">
+    <div className="select-none" style={{ position: "relative", width: 240, height: 240 }}>
+      {/* КАМЕНЬ — центр контейнера */}
       <div
-        className="select-none"
-        style={{ position: "relative", width: 240, height: 240 }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 200,
+          height: 200,
+          zIndex: 1,
+        }}
       >
-        {/* Камень */}
+        <Image
+          src="/pet-rock.png"
+          alt="Камень"
+          width={200}
+          height={200}
+          draggable={false}
+          priority
+          style={{ pointerEvents: "none", userSelect: "none" }}
+        />
+      </div>
+
+      {/* РУКА — справа от камня, кликабельна */}
+      <button
+        onClick={handlePet}
+        disabled={isPetting || isCooldown}
+        aria-label="Погладить камень"
+        style={{
+          position: "absolute",
+          top: 11,
+          right: -19,
+          transform: "none",
+          marginLeft: 0,
+          width: 160,
+          height: 160,
+          zIndex: 2,
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          cursor: isPetting || isCooldown ? "default" : "pointer",
+        }}
+      >
         <motion.div
+          initial={{ x: 0, y: 0, rotate: 45, scaleX: 1 }}
           animate={
             isPetting
-              ? { scale: [1, 1.05, 0.98, 1], rotate: [0, 2, -2, 0] }
-              : { scale: 1, rotate: 0 }
+              ? { x: [-15, -5, -15], y: [-5, 5, -5], rotate: [40, 35, 40], scaleX: 1 }
+              : { x: 0, y: 0, rotate: 45, scaleX: 1 }
           }
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+          transition={{ duration: 0.6, ease: "easeInOut", times: [0, 0.5, 1] }}
+          style={{ width: 160, height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}
         >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Image src="/pet-rock.png" alt="Pet Rock" width={240} height={240} priority />
-          </div>
-          {/* Блик */}
-          <AnimatePresence>
-            {isPetting && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.5, 0] }}
-                transition={{ duration: 0.6 }}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0,
-                  borderRadius: "50%",
-                  background: "rgba(255, 255, 255, 0.4)",
-                  filter: "blur(18px)",
-                  pointerEvents: "none",
-                }}
-              />
-            )}
-          </AnimatePresence>
+          <Image
+            src="/hand.png"
+            alt="Рука"
+            width={160}
+            height={160}
+            draggable={false}
+            priority
+            style={{ pointerEvents: "none", userSelect: "none" }}
+          />
         </motion.div>
+      </button>
 
-        {/* Рука — всегда видима, кликабельна */}
-        <button
-          onClick={handlePet}
-          disabled={isPetting}
-          aria-label="Погладить камень"
+      {isCooldown && (
+        <div
           style={{
             position: "absolute",
-            top: -8,
-            left: -12,
-            width: 160,
-            height: 160,
-            zIndex: 2,
-            background: "transparent",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
+            bottom: -12,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "rgba(0,0,0,0.6)",
+            color: "white",
+            padding: "6px 10px",
+            borderRadius: 12,
+            fontSize: 12,
+            fontWeight: 700,
+            textAlign: "center",
+            backdropFilter: "blur(4px)",
+            zIndex: 3,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap",
           }}
         >
-          <motion.div
-            initial={{ x: 0, y: 0, opacity: 1, rotate: -30, scaleX: 1 }}
-            animate={
-              isPetting
-                ? { x: [0, 8, 0], y: [0, 10, 0], opacity: 1, rotate: -30, scaleX: 1 }
-                : { x: 0, y: 0, opacity: 1, rotate: -30, scaleX: 1 }
-            }
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            style={{ width: 160, height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}
-          >
-            <Image
-              src="/hand.png"
-              alt="Hand Petting"
-              width={160}
-              height={160}
-              draggable={false}
-              priority
-              style={{ pointerEvents: "none", userSelect: "none" }}
-            />
-          </motion.div>
-        </button>
-      </div>
+          <span>Come back in:</span>
+          <span style={{ fontVariantNumeric: "tabular-nums" }}>{formatTime(remainingMs)}</span>
+        </div>
+      )}
     </div>
   );
+}
+
+function formatTime(ms: number) {
+  const totalSeconds = Math.ceil(ms / 1000);
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  const sStr = s < 10 ? `0${s}` : String(s);
+  return `${m}:${sStr}`;
 }

@@ -21,13 +21,14 @@ export default function Home() {
 
   
 
-  // Загружаем прогресс из localStorage
+  // Загружаем сохранённое количество поглаживаний при запуске
   useEffect(() => {
     try {
-      const storedCount = Number(localStorage.getItem("petrock_pet_count") || 0);
-      setPetCount(Number.isFinite(storedCount) ? storedCount : 0);
+      const raw = localStorage.getItem("petrock_pet_count");
+      const saved = raw ? parseInt(raw, 10) : 0;
+      setPetCount(Number.isNaN(saved) ? 0 : saved);
     } catch {
-      // Игнорируем ошибки доступа к localStorage
+      setPetCount(0);
     }
   }, []);
 
