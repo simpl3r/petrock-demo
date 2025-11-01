@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import PetRockButton from "../components/PetRockButton";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
-import { minikitConfig } from "../minikit.config";
 import styles from "./page.module.css";
  
 

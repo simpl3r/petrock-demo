@@ -77,8 +77,8 @@ export default function PetRockButton({ onPet }: Props) {
           aria-label="Погладить камень"
           style={{
             position: "absolute",
-            top: 12,
-            right: 8,
+            top: -8,
+            left: -12,
             width: 160,
             height: 160,
             zIndex: 2,
@@ -89,11 +89,11 @@ export default function PetRockButton({ onPet }: Props) {
           }}
         >
           <motion.div
-            initial={{ x: 0, y: 0, opacity: 1, rotate: 35, scaleX: -1 }}
+            initial={{ x: 0, y: 0, opacity: 1, rotate: -30, scaleX: 1 }}
             animate={
               isPetting
-                ? { x: [-10, 0, -10], y: [0, 6, 0], opacity: 1, rotate: 35, scaleX: -1 }
-                : { x: 0, y: 0, opacity: 1, rotate: 35, scaleX: -1 }
+                ? { x: [0, 8, 0], y: [0, 10, 0], opacity: 1, rotate: -30, scaleX: 1 }
+                : { x: 0, y: 0, opacity: 1, rotate: -30, scaleX: 1 }
             }
             transition={{ duration: 0.6, ease: "easeInOut" }}
             style={{ width: 160, height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}
