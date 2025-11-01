@@ -85,6 +85,26 @@ vercel env add NEXT_PUBLIC_ONCHAINKIT_API_KEY production
 vercel env add NEXT_PUBLIC_URL production
 ```
 
+## Reset Pet Count
+
+To reset the "pet" counter for all users, version the storage key and bump the version:
+
+- Add `NEXT_PUBLIC_PETROCK_COUNT_VERSION` to your environment (example in `.example.env`).
+- The app reads/writes the counter to `localStorage` key `petrock_pet_count_<VERSION>`.
+- Bump the version (e.g. from `1` to `2`) and redeploy — all users will start with a fresh counter.
+
+Example:
+
+```bash
+vercel env add NEXT_PUBLIC_PETROCK_COUNT_VERSION production
+# set value to 2 (or a date string)
+vercel --prod
+```
+
+Notes:
+- Old counters remain in users' browsers under the previous key and are ignored.
+- You can bump the version again whenever you need a global reset.
+
 ## Account Association
 
 ### 1. Sign Your Manifest

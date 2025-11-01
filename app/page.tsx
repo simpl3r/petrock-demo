@@ -8,6 +8,10 @@ import styles from "./page.module.css";
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
 
+  // Версия ключа счётчика для глобального сброса через env
+  const STORAGE_VERSION = process.env.NEXT_PUBLIC_PETROCK_COUNT_VERSION ?? "v1";
+  const STORAGE_KEY = `petrock_pet_count_${STORAGE_VERSION}`;
+
   // Инициализируем MiniKit кадр
   useEffect(() => {
     if (!isFrameReady) {
@@ -24,12 +28,27 @@ export default function Home() {
   // Загружаем сохранённое количество поглаживаний при запуске
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("petrock_pet_count");
+      const raw = localStorage.getItem(STORAGE_KEY);
       const saved = raw ? parseInt(raw, 10) : 0;
       setPetCount(Number.isNaN(saved) ? 0 : saved);
     } catch {
       setPetCount(0);
     }
+  }, []);
+
+  // Вызываем системный промпт установки PWA при открытии (если доступен)
+  useEffect(() => {
+    const handler = (e: any) => {
+      try {
+        e.preventDefault?.();
+        // Небольшая задержка, чтобы не мешать первичной загрузке UI
+        setTimeout(() => {
+          e.prompt?.();
+        }, 1200);
+      } catch {}
+    };
+    window.addEventListener("beforeinstallprompt", handler as any);
+    return () => window.removeEventListener("beforeinstallprompt", handler as any);
   }, []);
 
   
@@ -42,7 +61,7 @@ export default function Home() {
     setPetCount((prev) => {
       const next = prev + 1;
       try {
-        localStorage.setItem("petrock_pet_count", String(next));
+        localStorage.setItem(STORAGE_KEY, String(next));
       } catch {}
       return next;
     });
