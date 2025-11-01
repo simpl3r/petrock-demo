@@ -159,7 +159,6 @@ export default function CanvasPetRock({ onPet, className = "" }: Props) {
 
       // Palm
       ctx.fillStyle = "#FFA500";
-      // @ts-expect-error: roundRect may not be fully typed in some TS lib versions
       ctx.roundRect(0, -15, 70, 35, 15);
       ctx.fill();
 
@@ -168,7 +167,6 @@ export default function CanvasPetRock({ onPet, className = "" }: Props) {
         const fx = 60 + i * 10;
         const fy = -25 + Math.sin(time * 0.08 + i) * 4;
         ctx.fillStyle = "#FFA500";
-        // @ts-expect-error: roundRect typing
         ctx.roundRect(fx, fy, 18, 40, 8);
         ctx.fill();
 
