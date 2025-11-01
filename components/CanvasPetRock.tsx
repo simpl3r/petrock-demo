@@ -33,7 +33,7 @@ export default function CanvasPetRock({ onPet, className = "" }: Props) {
       pupilSize: 5,
     };
 
-    let hand = {
+    const hand = {
       x: -150,
       y: 350,
       phase: "approach" as HandPhase,
