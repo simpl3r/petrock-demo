@@ -13,6 +13,7 @@
     "buttonTitle": "Open",
     "splashImageUrl": "https://petrock-demo.vercel.app/blue-hero.png",
     "splashBackgroundColor": "#000000",
-    "webhookUrl": "https://petrock-demo.vercel.app/api/webhook"
+    "webhookUrl": "https://petrock-demo.vercel.app/api/webhook",
+    "disableNativeGestures": true
   }
 }
