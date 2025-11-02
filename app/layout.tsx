@@ -46,7 +46,7 @@ export default function RootLayout({
     <RootProvider>
       <html lang="en">
         <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-          <SafeArea>{children}</SafeArea>
+          <SafeArea disableNativeGestures>{children}</SafeArea>
         </body>
       </html>
     </RootProvider>
