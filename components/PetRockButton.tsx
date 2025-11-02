@@ -12,6 +12,7 @@ export default function PetRockButton({ onPet }: Props) {
   const [isCooldown, setIsCooldown] = useState(false);
   const cooldownRef = useRef<number | null>(null);
   const COOLDOWN_MS = 3 * 60 * 1000;
+  const COOLDOWN_STORAGE_KEY = "petrock_cooldown_end";
   const [remainingMs, setRemainingMs] = useState(0);
   const countdownIntervalRef = useRef<number | null>(null);
   const cooldownEndRef = useRef<number | null>(null);
@@ -21,6 +22,9 @@ export default function PetRockButton({ onPet }: Props) {
     setIsPetting(true);
     setIsCooldown(true);
     cooldownEndRef.current = Date.now() + COOLDOWN_MS;
+    try {
+      localStorage.setItem(COOLDOWN_STORAGE_KEY, String(cooldownEndRef.current));
+    } catch {}
     setRemainingMs(COOLDOWN_MS);
     try {
       onPet?.();
@@ -34,6 +38,9 @@ export default function PetRockButton({ onPet }: Props) {
       setIsCooldown(false);
       setRemainingMs(0);
       cooldownEndRef.current = null;
+      try {
+        localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+      } catch {}
       if (countdownIntervalRef.current) {
         clearInterval(countdownIntervalRef.current);
         countdownIntervalRef.current = null;
@@ -52,6 +59,9 @@ export default function PetRockButton({ onPet }: Props) {
         setIsCooldown(false);
         setRemainingMs(0);
         cooldownEndRef.current = null;
+        try {
+          localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+        } catch {}
         if (countdownIntervalRef.current) {
           clearInterval(countdownIntervalRef.current);
           countdownIntervalRef.current = null;
@@ -59,6 +69,49 @@ export default function PetRockButton({ onPet }: Props) {
       }
     }, 1000);
   };
+
+  // Восстановление кулдауна из localStorage при монтировании
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(COOLDOWN_STORAGE_KEY);
+      const storedEnd = raw ? parseInt(raw, 10) : 0;
+      if (storedEnd && Number.isFinite(storedEnd)) {
+        const now = Date.now();
+        if (storedEnd > now) {
+          cooldownEndRef.current = storedEnd;
+          setIsCooldown(true);
+          setRemainingMs(storedEnd - now);
+
+          // Запустить интервальный пересчёт
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+          }
+          countdownIntervalRef.current = window.setInterval(() => {
+            if (!cooldownEndRef.current) return;
+            const rem = Math.max(0, cooldownEndRef.current - Date.now());
+            setRemainingMs(rem);
+            if (rem <= 0) {
+              setIsCooldown(false);
+              setRemainingMs(0);
+              cooldownEndRef.current = null;
+              try {
+                localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+              } catch {}
+              if (countdownIntervalRef.current) {
+                clearInterval(countdownIntervalRef.current);
+                countdownIntervalRef.current = null;
+              }
+            }
+          }, 1000);
+        } else {
+          // Просрочен — очистим ключ
+          try {
+            localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+          } catch {}
+        }
+      }
+    } catch {}
+  }, []);
 
   // Очистка таймера кулдауна при размонтировании
   useEffect(() => {
