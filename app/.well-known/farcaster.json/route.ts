@@ -29,7 +29,11 @@ export function GET(req: Request) {
       // URLs normalized to current origin to avoid wrong domains
       iconUrl: resolveUrl(origin, miniapp.iconUrl),
       homeUrl: resolveUrl(origin, typeof miniapp.homeUrl === "string" ? miniapp.homeUrl : undefined),
-      imageUrl: resolveUrl(origin, miniapp.heroImageUrl ?? (miniapp as any).imageUrl),
+      // Prefer heroImageUrl; fallback to optional imageUrl if present
+      imageUrl: resolveUrl(
+        origin,
+        miniapp.heroImageUrl ?? (miniapp as Partial<{ imageUrl: string }>).imageUrl
+      ),
       buttonTitle: "Open",
       splashImageUrl: resolveUrl(origin, miniapp.splashImageUrl),
       splashBackgroundColor: miniapp.splashBackgroundColor,
