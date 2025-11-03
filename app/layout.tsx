@@ -12,15 +12,11 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/manifest.json",
     themeColor: "#000000",
     other: {
-      "fc:frame": JSON.stringify({
+      "fc:miniapp": JSON.stringify({
         version: minikitConfig.miniapp.version,
         imageUrl: minikitConfig.miniapp.heroImageUrl,
         button: {
           title: minikitConfig.miniapp.name,
-          action: {
-            name: minikitConfig.miniapp.name,
-            type: "launch_frame",
-          },
         },
       }),
     },
