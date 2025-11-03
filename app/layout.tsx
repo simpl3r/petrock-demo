@@ -11,6 +11,28 @@ export async function generateMetadata(): Promise<Metadata> {
     description: minikitConfig.miniapp.description,
     manifest: "/manifest.json",
     themeColor: "#000000",
+    metadataBase: new URL(minikitConfig.miniapp.homeUrl as string),
+    alternates: {
+      canonical: minikitConfig.miniapp.homeUrl as string,
+    },
+    openGraph: {
+      title: minikitConfig.miniapp.name,
+      description: minikitConfig.miniapp.description,
+      url: minikitConfig.miniapp.homeUrl as string,
+      siteName: minikitConfig.miniapp.name,
+      type: "website",
+      images: [
+        {
+          url: minikitConfig.miniapp.heroImageUrl as string,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: minikitConfig.miniapp.name,
+      description: minikitConfig.miniapp.description,
+      images: [minikitConfig.miniapp.heroImageUrl as string],
+    },
     other: {
       "fc:miniapp": JSON.stringify({
         version: minikitConfig.miniapp.version,
