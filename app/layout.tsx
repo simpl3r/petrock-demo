@@ -41,6 +41,18 @@ export async function generateMetadata(): Promise<Metadata> {
           title: minikitConfig.miniapp.name,
         },
       }),
+      // Temporary compatibility for clients still expecting frame meta
+      "fc:frame": JSON.stringify({
+        version: minikitConfig.miniapp.version,
+        imageUrl: minikitConfig.miniapp.heroImageUrl,
+        button: {
+          title: minikitConfig.miniapp.name,
+          action: {
+            name: minikitConfig.miniapp.name,
+            type: "launch_frame",
+          },
+        },
+      }),
     },
   };
 }
