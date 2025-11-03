@@ -1,8 +1,6 @@
 const ROOT_URL =
   process.env.NEXT_PUBLIC_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
-  'http://localhost:3000';
+  'https://petrock-demo.vercel.app';
 
 /**
  * MiniApp configuration object. Must follow the Farcaster MiniApp specification.
