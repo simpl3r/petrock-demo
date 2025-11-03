@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [minikitConfig.miniapp.heroImageUrl as string],
     },
     other: {
-      "fc:frame": JSON.stringify({
+      "fc:miniapp": JSON.stringify({
         version: minikitConfig.miniapp.version,
         imageUrl: minikitConfig.miniapp.heroImageUrl,
         button: {
