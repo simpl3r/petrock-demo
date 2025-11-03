@@ -28,9 +28,9 @@ export const minikitConfig = {
     primaryCategory: "social",
     tags: ["marketing", "ads", "quickstart", "waitlist"],
     heroImageUrl: `${ROOT_URL}/pet-rock.png`, 
-    tagline: "",
-    ogTitle: "",
-    ogDescription: "",
+    tagline: undefined,
+    ogTitle: undefined,
+    ogDescription: undefined,
     ogImageUrl: `${ROOT_URL}/pet-rock.png`,
   },
 } as const;
