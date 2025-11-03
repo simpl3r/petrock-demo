@@ -116,19 +116,36 @@ Notes:
 
 ### 2. Update Configuration
 
-Update your `minikit.config.ts` file to include the `accountAssociation` object:
+Update your `minikit.config.ts` file to include the `accountAssociation` object. You can now set it via environment variables for easier updates without code changes:
 
 ```ts
 export const minikitConfig = {
     accountAssociation: {
-        "header": "your-header-here",
-        "payload": "your-payload-here",
-        "signature": "your-signature-here"
+        header: process.env.MINIAPP_AA_HEADER || "your-header-here",
+        payload: process.env.MINIAPP_AA_PAYLOAD || "your-payload-here",
+        signature: process.env.MINIAPP_AA_SIGNATURE || "your-signature-here",
     },
     frame: {
         // ... rest of your frame configuration
     },
 }
+```
+
+Add the following variables in `.env.local` and in your Vercel environment:
+
+```bash
+MINIAPP_AA_HEADER="<paste-your-header>"
+MINIAPP_AA_PAYLOAD="<paste-your-payload>"
+MINIAPP_AA_SIGNATURE="<paste-your-signature>"
+```
+
+Then deploy:
+
+```bash
+vercel env add MINIAPP_AA_HEADER production
+vercel env add MINIAPP_AA_PAYLOAD production
+vercel env add MINIAPP_AA_SIGNATURE production
+vercel --prod
 ```
 
 ### 3. Deploy Updates
