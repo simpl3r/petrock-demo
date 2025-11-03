@@ -34,7 +34,7 @@ export function GET(req: Request) {
         origin,
         miniapp.heroImageUrl ?? (miniapp as Partial<{ imageUrl: string }>).imageUrl
       ),
-      buttonTitle: "Open",
+      buttonTitle: miniapp.name,
       splashImageUrl: resolveUrl(origin, miniapp.splashImageUrl),
       splashBackgroundColor: miniapp.splashBackgroundColor,
       webhookUrl: resolveUrl(origin, miniapp.webhookUrl),
