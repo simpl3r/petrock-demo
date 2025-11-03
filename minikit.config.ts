@@ -38,7 +38,7 @@ export const minikitConfig = {
     webhookUrl: `${ROOT_URL}/api/webhook`,
     disableNativeGestures: true,
     primaryCategory: "social",
-    tags: ["marketing", "ads", "quickstart", "waitlist"],
+    tags: ["petrock", "miniapp", "social", "fun", "companion"],
     heroImageUrl: `${ROOT_URL}/pet-rock.png`, 
     tagline: undefined,
     ogTitle: undefined,
