@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import PetRockButton from "../components/PetRockButton";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import styles from "./page.module.css";
@@ -23,6 +24,20 @@ export default function Home() {
       setFrameReady();
     }
   }, [setFrameReady, isFrameReady]);
+
+  // Отключаем нативные жесты во вьюхе Farcaster через Mini App SDK
+  useEffect(() => {
+    (async () => {
+      try {
+        await sdk.actions.ready({ disableNativeGestures: true });
+      } catch (err) {
+        // В обычном веб-превью или вне контейнера Mini App вызов может валиться — игнорируем
+        if (process.env.NODE_ENV === "development") {
+          console.warn("miniapp-sdk ready failed (non-miniapp env?)", err);
+        }
+      }
+    })();
+  }, []);
 
   // Состояние игры
   const [petCount, setPetCount] = useState<number>(0);
