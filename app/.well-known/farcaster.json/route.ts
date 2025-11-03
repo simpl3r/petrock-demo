@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { minikitConfig } from "../../../minikit.config";
 
 export function GET() {
-  const { accountAssociation, miniapp } = minikitConfig as any;
+  const { accountAssociation, miniapp } = minikitConfig;
 
   const manifest = {
     ...(accountAssociation ? { accountAssociation } : {}),
