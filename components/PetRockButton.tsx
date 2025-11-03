@@ -8,6 +8,8 @@ type Props = {
 };
 
 export default function PetRockButton({ onPet }: Props) {
+  // Timer/Cooldown is temporarily disabled via feature flag
+  const ENABLE_COOLDOWN = false;
   const [isPetting, setIsPetting] = useState(false);
   const [isCooldown, setIsCooldown] = useState(false);
   const cooldownRef = useRef<number | null>(null);
@@ -20,42 +22,24 @@ export default function PetRockButton({ onPet }: Props) {
   const handlePet = () => {
     if (isPetting || isCooldown) return;
     setIsPetting(true);
-    setIsCooldown(true);
-    cooldownEndRef.current = Date.now() + COOLDOWN_MS;
-    try {
-      localStorage.setItem(COOLDOWN_STORAGE_KEY, String(cooldownEndRef.current));
-    } catch {}
-    setRemainingMs(COOLDOWN_MS);
+    if (ENABLE_COOLDOWN) {
+      setIsCooldown(true);
+      cooldownEndRef.current = Date.now() + COOLDOWN_MS;
+      try {
+        localStorage.setItem(COOLDOWN_STORAGE_KEY, String(cooldownEndRef.current));
+      } catch {}
+      setRemainingMs(COOLDOWN_MS);
+    }
     try {
       onPet?.();
     } finally {
       setTimeout(() => setIsPetting(false), 600);
     }
-    if (cooldownRef.current) {
-      clearTimeout(cooldownRef.current);
-    }
-    cooldownRef.current = window.setTimeout(() => {
-      setIsCooldown(false);
-      setRemainingMs(0);
-      cooldownEndRef.current = null;
-      try {
-        localStorage.removeItem(COOLDOWN_STORAGE_KEY);
-      } catch {}
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-        countdownIntervalRef.current = null;
+    if (ENABLE_COOLDOWN) {
+      if (cooldownRef.current) {
+        clearTimeout(cooldownRef.current);
       }
-      cooldownRef.current = null;
-    }, COOLDOWN_MS);
-
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-    }
-    countdownIntervalRef.current = window.setInterval(() => {
-      if (!cooldownEndRef.current) return;
-      const rem = Math.max(0, cooldownEndRef.current - Date.now());
-      setRemainingMs(rem);
-      if (rem <= 0) {
+      cooldownRef.current = window.setTimeout(() => {
         setIsCooldown(false);
         setRemainingMs(0);
         cooldownEndRef.current = null;
@@ -66,12 +50,35 @@ export default function PetRockButton({ onPet }: Props) {
           clearInterval(countdownIntervalRef.current);
           countdownIntervalRef.current = null;
         }
+        cooldownRef.current = null;
+      }, COOLDOWN_MS);
+
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
       }
-    }, 1000);
+      countdownIntervalRef.current = window.setInterval(() => {
+        if (!cooldownEndRef.current) return;
+        const rem = Math.max(0, cooldownEndRef.current - Date.now());
+        setRemainingMs(rem);
+        if (rem <= 0) {
+          setIsCooldown(false);
+          setRemainingMs(0);
+          cooldownEndRef.current = null;
+          try {
+            localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+          } catch {}
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+        }
+      }, 1000);
+    }
   };
 
-  // Восстановление кулдауна из localStorage при монтировании
+  // Восстановление кулдауна из localStorage при монтировании (отключено)
   useEffect(() => {
+    if (!ENABLE_COOLDOWN) return;
     try {
       const raw = localStorage.getItem(COOLDOWN_STORAGE_KEY);
       const storedEnd = raw ? parseInt(raw, 10) : 0;
@@ -113,9 +120,10 @@ export default function PetRockButton({ onPet }: Props) {
     } catch {}
   }, []);
 
-  // Очистка таймера кулдауна при размонтировании
+  // Очистка таймера кулдауна при размонтировании (отключено)
   useEffect(() => {
     return () => {
+      if (!ENABLE_COOLDOWN) return;
       if (cooldownRef.current) {
         clearTimeout(cooldownRef.current);
         cooldownRef.current = null;
