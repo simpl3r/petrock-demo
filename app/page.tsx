@@ -26,10 +26,14 @@ export default function Home() {
   }, [setFrameReady, isFrameReady]);
 
   // Отключаем нативные жесты во вьюхе Farcaster через Mini App SDK
+  // Вызываем только после готовности MiniKit кадра, чтобы избежать конфликтов рукопожатия
   useEffect(() => {
+    if (!isFrameReady) return;
     (async () => {
       try {
-        await sdk.actions.ready({ disableNativeGestures: true });
+        if (typeof sdk?.actions?.ready === "function") {
+          await sdk.actions.ready({ disableNativeGestures: true });
+        }
       } catch (err) {
         // В обычном веб-превью или вне контейнера Mini App вызов может валиться — игнорируем
         if (process.env.NODE_ENV === "development") {
@@ -37,7 +41,7 @@ export default function Home() {
         }
       }
     })();
-  }, []);
+  }, [isFrameReady]);
 
   // Состояние игры
   const [petCount, setPetCount] = useState<number>(0);
