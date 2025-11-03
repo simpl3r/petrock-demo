@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
-
-const HOSTED_MANIFEST_URL =
-  "https://api.farcaster.xyz/miniapps/hosted-manifest/019a473c-664d-95f0-78b2-26bc9c836b08";
+import { minikitConfig } from "../../../minikit.config";
 
 export function GET() {
-  // Temporary 307 redirect to Farcaster Hosted Manifest per publishing checklist
-  return NextResponse.redirect(HOSTED_MANIFEST_URL, 307);
+  const manifest = {
+    ...minikitConfig,
+    baseBuilder: {
+      ownerAddress: "0x4a26eEC01bF369bB53f6743bA15952606Cd0536A",
+    },
+  };
+
+  return NextResponse.json(manifest, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=0, must-revalidate",
+    },
+  });
 }
