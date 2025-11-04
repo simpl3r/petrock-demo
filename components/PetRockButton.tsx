@@ -1,13 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 
-type Props = {
+interface PetRockButtonProps {
   onPet?: () => void;
-};
+}
 
-export default function PetRockButton({ onPet }: Props) {
+function PetRockButton({ onPet }: PetRockButtonProps) {
   // Timer/Cooldown is temporarily disabled via feature flag
   const ENABLE_COOLDOWN = false;
   const [isPetting, setIsPetting] = useState(false);
@@ -118,7 +118,7 @@ export default function PetRockButton({ onPet }: Props) {
         }
       }
     } catch {}
-  }, []);
+  }, [ENABLE_COOLDOWN]);
 
   // Очистка таймера кулдауна при размонтировании (отключено)
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function PetRockButton({ onPet }: Props) {
         countdownIntervalRef.current = null;
       }
     };
-  }, []);
+  }, [ENABLE_COOLDOWN]);
 
   return (
     <div className="select-none" style={{ position: "relative", width: 240, height: 240 }}>
@@ -231,6 +231,8 @@ export default function PetRockButton({ onPet }: Props) {
     </div>
   );
 }
+
+export default memo(PetRockButton);
 
 function formatTime(ms: number) {
   const totalSeconds = Math.ceil(ms / 1000);

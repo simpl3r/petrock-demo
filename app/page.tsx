@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import PetRockButton from "../components/PetRockButton";
 import Image from "next/image";
@@ -14,6 +14,42 @@ type MiniAppSdkFavorites = {
     addToFavorites?: () => Promise<void> | void;
   };
 };
+
+interface User {
+  pfpUrl?: string;
+  displayName?: string;
+  username?: string;
+  fid?: number;
+}
+
+const UserHeader = memo(({ user }: { user: User }) => {
+  const avatarUrl = user?.pfpUrl || "/blue-icon.png";
+  const displayName = user?.displayName ?? "Guest";
+  const username = user?.username;
+  const fid = user?.fid;
+  
+  return (
+    <div className={styles.userHeader}>
+      <Image
+        src={avatarUrl}
+        alt={displayName}
+        className={styles.userAvatar}
+        width={36}
+        height={36}
+        unoptimized
+      />
+      <div className={styles.userDetails}>
+        <div className={styles.userName}>{displayName}</div>
+        <div className={styles.userMeta}>
+          {username ? `@${username}` : "—"}
+          {typeof fid === "number" ? ` · FID ${fid}` : ""}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+UserHeader.displayName = "UserHeader";
 
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
@@ -83,33 +119,6 @@ export default function Home() {
     }
   }, [STORAGE_KEY]);
 
-  // Автоматически предлагаем «Add Mini App» через SDK на каждую сессию
-  useEffect(() => {
-    if (!isFrameReady) return;
-    const ATTEMPT_KEY = "petrock_auto_add_attempted_session_v1";
-    try {
-      const attempted = sessionStorage.getItem(ATTEMPT_KEY) === "1";
-      if (attempted) return;
-    } catch {}
-    (async () => {
-      try {
-        const sdkFavorites = sdk as unknown as MiniAppSdkFavorites;
-        const maybeAddToFavorites = sdkFavorites.actions?.addToFavorites;
-        if (typeof maybeAddToFavorites === "function") {
-          await maybeAddToFavorites();
-        }
-      } catch (err) {
-        if (process.env.NODE_ENV === "development") {
-          console.warn("addToFavorites failed or unsupported", err);
-        }
-      } finally {
-        try {
-          sessionStorage.setItem(ATTEMPT_KEY, "1");
-        } catch {}
-      }
-    })();
-  }, [isFrameReady]);
-
   
 
   const handlePet = () => {
@@ -144,35 +153,15 @@ export default function Home() {
     }
   };
 
+  const userHeader = useMemo(() => {
+    if (!context?.user) return null;
+    return <UserHeader user={context.user} />;
+  }, [context?.user]);
+
   return (
     <div className={styles.container}>
       {/* User header with connected account info */}
-      {(() => {
-        const user = context?.user;
-        const avatarUrl = user?.pfpUrl || "/blue-icon.png";
-        const displayName = user?.displayName ?? "Guest";
-        const username = user?.username;
-        const fid = user?.fid;
-        return (
-          <div className={styles.userHeader}>
-            <Image
-              src={avatarUrl}
-              alt={displayName}
-              className={styles.userAvatar}
-              width={36}
-              height={36}
-              unoptimized
-            />
-            <div className={styles.userDetails}>
-              <div className={styles.userName}>{displayName}</div>
-              <div className={styles.userMeta}>
-                {username ? `@${username}` : "—"}
-                {typeof fid === "number" ? ` · FID ${fid}` : ""}
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {userHeader}
   <div className={styles.content}>
     {showGreeting && (
       <>
