@@ -196,7 +196,7 @@ export default function Home() {
 
         <div className={styles.shareRow}>
           <div className={styles.shareButtonFrame}>
-            <Button onClick={handleShare}>
+            <Button onClick={handleShare} className="focus:ring-0 focus:outline-none focus-visible:outline-none">
               Share with friends
             </Button>
           </div>
