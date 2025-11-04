@@ -6,19 +6,27 @@ import { RootProvider } from "./rootProvider";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const baseString = minikitConfig.miniapp.homeUrl as string;
+  let metadataBase: URL | undefined;
+  try {
+    metadataBase = new URL(baseString);
+  } catch {
+    // В случае некорректного URL в env (без протокола и т.п.) не падаем на пререндере
+    metadataBase = undefined;
+  }
   return {
     title: minikitConfig.miniapp.name,
     description: minikitConfig.miniapp.description,
     manifest: "/manifest.json",
     themeColor: "#6200ea",
-    metadataBase: new URL(minikitConfig.miniapp.homeUrl as string),
+    metadataBase,
     alternates: {
-      canonical: minikitConfig.miniapp.homeUrl as string,
+      canonical: metadataBase?.href ?? baseString,
     },
     openGraph: {
       title: minikitConfig.miniapp.name,
       description: minikitConfig.miniapp.description,
-      url: minikitConfig.miniapp.homeUrl as string,
+      url: metadataBase?.href ?? baseString,
       siteName: minikitConfig.miniapp.name,
       type: "website",
       images: [
@@ -73,12 +81,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <RootProvider>
-      <html lang="en">
-        <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+    <html lang="en">
+      <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+        <RootProvider>
           <SafeArea>{children}</SafeArea>
-        </body>
-      </html>
-    </RootProvider>
+        </RootProvider>
+      </body>
+    </html>
   );
 }

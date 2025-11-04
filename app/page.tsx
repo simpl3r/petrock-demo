@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import PetRockButton from "../components/PetRockButton";
+import Image from "next/image";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import styles from "./page.module.css";
 
@@ -112,7 +113,14 @@ export default function Home() {
         const fid = user?.fid;
         return (
           <div className={styles.userHeader}>
-            <img src={avatarUrl} alt={displayName} className={styles.userAvatar} />
+            <Image
+              src={avatarUrl}
+              alt={displayName}
+              className={styles.userAvatar}
+              width={36}
+              height={36}
+              unoptimized
+            />
             <div className={styles.userDetails}>
               <div className={styles.userName}>{displayName}</div>
               <div className={styles.userMeta}>
