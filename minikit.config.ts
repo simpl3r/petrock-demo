@@ -28,7 +28,7 @@ export const minikitConfig = {
   miniapp: {
     version: "1",
     name: "PetRock", 
-    subtitle: "Your AI Ad Companion", 
+    subtitle: "Your fun rock", 
     description: "Ads",
     screenshotUrls: [`${ROOT_URL}/pet-rock.png`],
     iconUrl: `${ROOT_URL}/pet-rock.png`,
