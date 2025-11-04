@@ -3,7 +3,9 @@ import { useState, useEffect } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import PetRockButton from "../components/PetRockButton";
 import Image from "next/image";
-import { useMiniKit } from "@coinbase/onchainkit/minikit";
+import { useMiniKit, useComposeCast } from "@coinbase/onchainkit/minikit";
+import { Button } from "../components/ui/button";
+import { minikitConfig } from "../minikit.config";
 import styles from "./page.module.css";
 
 // Локальный тип для безопасной проверки наличия метода добавления в избранное
@@ -15,6 +17,7 @@ type MiniAppSdkFavorites = {
 
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
+  const { composeCastAsync } = useComposeCast();
 
   // Версия ключа счётчика для глобального сброса через env
   const STORAGE_VERSION = process.env.NEXT_PUBLIC_PETROCK_COUNT_VERSION ?? "v1";
@@ -119,6 +122,28 @@ export default function Home() {
     });
   };
 
+  const handleShare = async () => {
+    try {
+      const text = `Petting my rock on ${minikitConfig.miniapp.name}! Join me 👉`;
+      const embedUrl = String(minikitConfig.miniapp.homeUrl || "");
+      const result = await composeCastAsync({
+        text,
+        embeds: [embedUrl],
+      });
+      if (process.env.NODE_ENV === "development") {
+        if (result?.cast) {
+          console.log("Cast created successfully:", result.cast.hash);
+        } else {
+          console.log("User cancelled or composer unavailable");
+        }
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Compose cast failed or unsupported in this environment", error);
+      }
+    }
+  };
+
   return (
     <div className={styles.container}>
       {/* User header with connected account info */}
@@ -169,6 +194,13 @@ export default function Home() {
           </div>
         </div>
 
+        <div className={styles.shareRow}>
+          <div className={styles.shareButtonFrame}>
+            <Button onClick={handleShare}>
+              Share with friends
+            </Button>
+          </div>
+        </div>
         
       </div>
     </div>

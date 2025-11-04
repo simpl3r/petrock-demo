@@ -316,6 +316,26 @@
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.75);
 }
+
+/* --- Share button frame styled similar to userHeader --- */
+.shareRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.shareButtonFrame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+}
 .handMotion {
   position: relative;
   width: 100%;
