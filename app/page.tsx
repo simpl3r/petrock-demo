@@ -63,12 +63,12 @@ export default function Home() {
     }
   }, [STORAGE_KEY]);
 
-  // Автоматически предлагаем добавить мини‑приложение через SDK, один раз
+  // Автоматически предлагаем «Add Mini App» через SDK на каждую сессию
   useEffect(() => {
     if (!isFrameReady) return;
-    const ATTEMPT_KEY = "petrock_auto_add_attempted_v1";
+    const ATTEMPT_KEY = "petrock_auto_add_attempted_session_v1";
     try {
-      const attempted = localStorage.getItem(ATTEMPT_KEY) === "1";
+      const attempted = sessionStorage.getItem(ATTEMPT_KEY) === "1";
       if (attempted) return;
     } catch {}
     (async () => {
@@ -84,7 +84,7 @@ export default function Home() {
         }
       } finally {
         try {
-          localStorage.setItem(ATTEMPT_KEY, "1");
+          sessionStorage.setItem(ATTEMPT_KEY, "1");
         } catch {}
       }
     })();
