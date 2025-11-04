@@ -11,6 +11,13 @@ type BeforeInstallPromptEvent = Event & {
   userChoice?: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
+// Локальный тип для безопасной проверки наличия метода добавления в избранное
+type MiniAppSdkFavorites = {
+  actions?: {
+    addToFavorites?: () => Promise<void> | void;
+  };
+};
+
 export default function Home() {
   const { isFrameReady, setFrameReady, context } = useMiniKit();
 
@@ -101,7 +108,8 @@ export default function Home() {
   const handleAddMiniApp = async () => {
     // Сначала пробуем через Farcaster Mini App SDK, если у клиента есть поддержка «избранного»
     try {
-      const maybeAddToFavorites = (sdk as any)?.actions?.addToFavorites;
+      const sdkFavorites = sdk as unknown as MiniAppSdkFavorites;
+      const maybeAddToFavorites = sdkFavorites.actions?.addToFavorites;
       if (typeof maybeAddToFavorites === "function") {
         await maybeAddToFavorites();
         setShowAddBanner(false);
