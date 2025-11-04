@@ -29,8 +29,7 @@ export default function Home() {
     }
   }, [setFrameReady, isFrameReady]);
 
-  // Отключаем нативные жесты во вьюхе Farcaster через Mini App SDK
-  // Вызываем только после готовности MiniKit кадра, чтобы избежать конфликтов рукопожатия
+  // После готовности MiniKit: ready-handshake и автопредложение «Add Mini App» (один раз за сессию)
   useEffect(() => {
     if (!isFrameReady) return;
     (async () => {
@@ -38,10 +37,28 @@ export default function Home() {
         if (typeof sdk?.actions?.ready === "function") {
           await sdk.actions.ready({ disableNativeGestures: true });
         }
+        const ATTEMPT_KEY = "petrock_auto_add_attempted_session_v1";
+        const attempted = (() => {
+          try {
+            return sessionStorage.getItem(ATTEMPT_KEY) === "1";
+          } catch {
+            return false;
+          }
+        })();
+        if (!attempted) {
+          const sdkFavorites = sdk as unknown as MiniAppSdkFavorites;
+          const maybeAddToFavorites = sdkFavorites.actions?.addToFavorites;
+          if (typeof maybeAddToFavorites === "function") {
+            await maybeAddToFavorites();
+          }
+          try {
+            sessionStorage.setItem(ATTEMPT_KEY, "1");
+          } catch {}
+        }
       } catch (err) {
-        // В обычном веб-превью или вне контейнера Mini App вызов может валиться — игнорируем
+        // В обычном веб-превью или вне контейнера Mini App вызовы могут валиться — игнорируем
         if (process.env.NODE_ENV === "development") {
-          console.warn("miniapp-sdk ready failed (non-miniapp env?)", err);
+          console.warn("miniapp-sdk ready/addToFavorites failed (non-miniapp env?)", err);
         }
       }
     })();
