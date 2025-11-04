@@ -17,8 +17,10 @@ export default function Home() {
   // Версия ключа счётчика для глобального сброса через env
   const STORAGE_VERSION = process.env.NEXT_PUBLIC_PETROCK_COUNT_VERSION ?? "v1";
   const STORAGE_KEY = `petrock_pet_count_${STORAGE_VERSION}`;
-  // Флаг показа приветственного блока управляется через ENV (Vercel/локально)
-  const SHOW_GREETING = process.env.NEXT_PUBLIC_SHOW_GREETING === "true";
+  // Динамический флаг показа приветственного блока: Edge Config → ENV фолбэк
+  const [showGreeting, setShowGreeting] = useState<boolean>(
+    process.env.NEXT_PUBLIC_SHOW_GREETING === "true"
+  );
 
   // Инициализируем MiniKit кадр
   useEffect(() => {
@@ -47,8 +49,20 @@ export default function Home() {
 
   // Состояние игры
   const [petCount, setPetCount] = useState<number>(0);
-  
+  // Загружаем флаг из /api/config (Edge Config) в рантайме
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/config", { cache: "no-store" });
+        const json = await res.json();
+        if (typeof json?.showGreeting === "boolean") {
+          setShowGreeting(json.showGreeting);
+        }
+      } catch {}
+    })();
+  }, []);
 
+  
   
 
   // Загружаем сохранённое количество поглаживаний при запуске
@@ -116,7 +130,7 @@ export default function Home() {
         );
       })()}
   <div className={styles.content}>
-    {SHOW_GREETING && (
+    {showGreeting && (
       <>
         <h1 className={styles.title}>Pet Rock</h1>
         <p className={styles.subtitle}>
