@@ -17,10 +17,8 @@ export default function Home() {
   // Версия ключа счётчика для глобального сброса через env
   const STORAGE_VERSION = process.env.NEXT_PUBLIC_PETROCK_COUNT_VERSION ?? "v1";
   const STORAGE_KEY = `petrock_pet_count_${STORAGE_VERSION}`;
-  // Динамический флаг показа приветственного блока: Edge Config → ENV фолбэк
-  const [showGreeting, setShowGreeting] = useState<boolean>(
-    process.env.NEXT_PUBLIC_SHOW_GREETING === "true"
-  );
+  // Флаг показа приветственного блока: читаем единожды из ENV
+  const showGreeting = process.env.NEXT_PUBLIC_SHOW_GREETING === "true";
 
   // Инициализируем MiniKit кадр
   useEffect(() => {
