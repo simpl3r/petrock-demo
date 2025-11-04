@@ -335,6 +335,12 @@
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(8px);
+  transition: border-color 150ms ease;
+}
+
+.shareButtonFrame:focus-within {
+  border-color: transparent;
+  outline: none;
 }
 .handMotion {
   position: relative;

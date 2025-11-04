@@ -124,7 +124,7 @@ export default function Home() {
 
   const handleShare = async () => {
     try {
-      const text = `Petting my rock on ${minikitConfig.miniapp.name}! Join me 👉`;
+      const text = `Petting my rock on ${minikitConfig.miniapp.name}! Join me 👉\n\nbuilt by @s1mpl3r`;
       const embedUrl = String(minikitConfig.miniapp.homeUrl || "");
       const result = await composeCastAsync({
         text,
@@ -196,7 +196,10 @@ export default function Home() {
 
         <div className={styles.shareRow}>
           <div className={styles.shareButtonFrame}>
-            <Button onClick={handleShare} className="focus:ring-0 focus:outline-none focus-visible:outline-none">
+            <Button
+              onClick={handleShare}
+              className="focus:ring-0 focus:outline-none focus-visible:outline-none focus:shadow-none focus-visible:shadow-none focus:ring-offset-0"
+            >
               Share with friends
             </Button>
           </div>
