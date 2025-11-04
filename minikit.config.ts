@@ -1,6 +1,26 @@
-const ROOT_URL =
-  process.env.NEXT_PUBLIC_URL ||
-  'https://petrock-demo.vercel.app';
+// Normalize the app root URL to a safe https origin without localhost/IP
+function normalizeRootUrl(raw?: string): string {
+  const fallback = 'https://petrock-demo.vercel.app';
+  const base = raw?.trim();
+  const candidate = base
+    ? (base.startsWith('http') ? base : `https://${base}`)
+    : fallback;
+  try {
+    const url = new URL(candidate);
+    const host = url.hostname;
+    const isIpV4 = /^\d+\.\d+\.\d+\.\d+$/.test(host);
+    const isIpV6 = /:/.test(host);
+    if (url.protocol !== 'https:' || host === 'localhost' || isIpV4 || isIpV6) {
+      return fallback;
+    }
+    // Return origin to avoid accidental paths or trailing slashes
+    return url.origin;
+  } catch {
+    return fallback;
+  }
+}
+
+const ROOT_URL = normalizeRootUrl(process.env.NEXT_PUBLIC_URL);
 
 const AA_HEADER =
   process.env.MINIAPP_AA_HEADER ||
