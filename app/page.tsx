@@ -49,18 +49,7 @@ export default function Home() {
 
   // Состояние игры
   const [petCount, setPetCount] = useState<number>(0);
-  // Загружаем флаг из /api/config (Edge Config) в рантайме
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/config", { cache: "no-store" });
-        const json = await res.json();
-        if (typeof json?.showGreeting === "boolean") {
-          setShowGreeting(json.showGreeting);
-        }
-      } catch {}
-    })();
-  }, []);
+  // Управление приветствием только через ENV (NEXT_PUBLIC_SHOW_GREETING)
 
   
   
