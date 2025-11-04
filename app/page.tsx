@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import PetRockButton from "../components/PetRockButton";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
@@ -49,6 +49,11 @@ export default function Home() {
   const [petCount, setPetCount] = useState<number>(0);
   // Управление приветствием только через ENV (NEXT_PUBLIC_SHOW_GREETING)
 
+  // Локальное предложение добавить приложение: баннер и хэндлеры
+  const [showAddBanner, setShowAddBanner] = useState<boolean>(false);
+  const ADD_BANNER_DISMISSED_KEY = "petrock_add_banner_dismissed";
+  const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
+
   
   
 
@@ -63,20 +68,58 @@ export default function Home() {
     }
   }, [STORAGE_KEY]);
 
-  // Вызываем системный промпт установки PWA при открытии (если доступен)
+  // Перехватываем системный промпт установки PWA и сохраняем для ручного вызова
   useEffect(() => {
     const handler = (e: BeforeInstallPromptEvent) => {
       try {
         e.preventDefault?.();
-        // Небольшая задержка, чтобы не мешать первичной загрузке UI
-        setTimeout(() => {
-          e.prompt?.();
-        }, 1200);
+        // Сохраняем событие для последующего вызова из баннера
+        deferredPromptRef.current = e;
       } catch {}
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
+
+  // Показываем баннер при первом открытии, если ранее не скрыт
+  useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem(ADD_BANNER_DISMISSED_KEY) === "1";
+      if (!dismissed) {
+        setShowAddBanner(true);
+      }
+    } catch {}
+  }, []);
+
+  const handleDismissAddBanner = () => {
+    try {
+      localStorage.setItem(ADD_BANNER_DISMISSED_KEY, "1");
+    } catch {}
+    setShowAddBanner(false);
+  };
+
+  const handleAddMiniApp = async () => {
+    // Сначала пробуем через Farcaster Mini App SDK, если у клиента есть поддержка «избранного»
+    try {
+      const maybeAddToFavorites = (sdk as any)?.actions?.addToFavorites;
+      if (typeof maybeAddToFavorites === "function") {
+        await maybeAddToFavorites();
+        setShowAddBanner(false);
+        return;
+      }
+    } catch {}
+
+    // Фолбэк: предлагаем установку PWA (домашний экран) если доступно
+    try {
+      const evt = deferredPromptRef.current;
+      await evt?.prompt?.();
+      setShowAddBanner(false);
+      return;
+    } catch {}
+
+    // Если ни один способ недоступен — просто скрываем баннер
+    setShowAddBanner(false);
+  };
 
   
 
@@ -117,6 +160,19 @@ export default function Home() {
         );
       })()}
   <div className={styles.content}>
+    {showAddBanner && (
+      <div className={styles.addBanner}>
+        <div className={styles.addBannerTitle}>Добавить в Мои мини‑приложения?</div>
+        <div className={styles.addBannerActions}>
+          <button className={styles.addBannerButton} onClick={handleAddMiniApp}>
+            Добавить
+          </button>
+          <button className={styles.addBannerDismiss} onClick={handleDismissAddBanner}>
+            Не сейчас
+          </button>
+        </div>
+      </div>
+    )}
     {showGreeting && (
       <>
         <h1 className={styles.title}>Pet Rock</h1>
