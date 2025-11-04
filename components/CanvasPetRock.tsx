@@ -67,7 +67,7 @@ export default function CanvasPetRock({ onPet, className = "" }: Props) {
       const lookX = ex + (dx / dist) * 8;
       const lookY = ey + (dy / dist) * 8;
 
-      ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#6200ea";
       ctx.beginPath();
       ctx.arc(lookX, lookY, stone.pupilSize, 0, Math.PI * 2);
       ctx.fill();

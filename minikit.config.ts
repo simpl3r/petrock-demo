@@ -33,7 +33,7 @@ export const minikitConfig = {
     screenshotUrls: [`${ROOT_URL}/pet-rock.png`],
     iconUrl: `${ROOT_URL}/pet-rock.png`,
     splashImageUrl: `${ROOT_URL}/pet-rock.png`,
-    splashBackgroundColor: "#000000",
+    splashBackgroundColor: "#6200ea",
     homeUrl: ROOT_URL,
     webhookUrl: `${ROOT_URL}/api/webhook`,
     disableNativeGestures: true,

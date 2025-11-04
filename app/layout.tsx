@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: minikitConfig.miniapp.name,
     description: minikitConfig.miniapp.description,
     manifest: "/manifest.json",
-    themeColor: "#000000",
+    themeColor: "#6200ea",
     metadataBase: new URL(minikitConfig.miniapp.homeUrl as string),
     alternates: {
       canonical: minikitConfig.miniapp.homeUrl as string,
