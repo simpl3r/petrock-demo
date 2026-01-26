@@ -29,13 +29,17 @@ Integrated directly with Farcaster, you can share your petting milestones with y
 
 ---
 
-## 🌍 Built for the Superchain
+## 📱 Farcaster & Base Mini App
 
-Pet Rock isn't just an app; it's a **Superchain native**. Living inside your Farcaster client, it bridges the gap between social media and digital ownership, proving that even a rock can be onchain.
+Pet Rock is a fully integrated **Mini App**, designed to run natively within:
+
+*   **Farcaster Clients**: Engage with your rock directly in **Warpcast** frames.
+*   **Base App**: Experience the app with full wallet integration on the **Base** network.
+
+It demonstrates the power of the **Farcaster SDK (MiniKit)** and **OnchainKit** to create seamless social-crypto experiences.
 
 ---
 
 <div align="center">
-  <p><i>"It’s not just a rock. It’s a lifestyle."</i></p>
-  <p><b>Join the movement on Warpcast.</b></p>
+  <p><b>Base</b> • <b>Farcaster</b> • <b>OnchainKit</b></p>
 </div>
